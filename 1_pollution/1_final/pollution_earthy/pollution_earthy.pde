@@ -4,6 +4,9 @@
   Date:  23-10-2017
   By:    Mayank Joneja - botmayank@gmail.com
          Ameet Singh - ameet.pearl@gmail.com
+         
+  Note: Install the TTF font in the data folder for the Subway Ticker font from http://www.1001fonts.com/subway-ticker-font.html
+        before running the sketch
 */
 
 Mover[] movers = new Mover[40];
