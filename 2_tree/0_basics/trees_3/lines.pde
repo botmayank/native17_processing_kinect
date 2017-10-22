@@ -13,8 +13,7 @@ class Lines{
   }
   
   void growLineL(int line_index){
-    //line_index based on left hand movt. count
-    
+    //line_index based on left hand movt. count   
     
    //color line_g = color(line_gray);
    dline_l.setFill(255);
