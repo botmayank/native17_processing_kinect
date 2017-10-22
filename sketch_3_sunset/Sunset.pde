@@ -2,11 +2,11 @@ class Sunset
 {
   SunsetLayer[] layers;
   int nLayers;
-  
-  float maxDesaturated = 30; // color range 0-100
+  float wiggleSkyRate;
+  float wiggleSeaRate;
   float curDesaturated;
   boolean isIncDesaturation;
-  float saturationIncrement = 1;
+  float maxWiggleRate = 5; //just to keep a check on how fast can u wiggle
   boolean randomBool() {
   return random(1) > .5;
   }
@@ -34,26 +34,30 @@ class Sunset
     PShape s = createShape();
     s.beginShape();
     PShape tempS = loadShape(file).getChild(0);
-    println("new layer");
     for(int i = 0; i < tempS.getVertexCount(); i++)
     {  
       PVector v = tempS.getVertex(i);
       s.vertex(v.x, v.y);
-      println(v);
     }
     s.endShape(CLOSE);
     return s;
   }
 
-  void wiggle()
+  void wiggleSky()
   {
-     for (int i = 0; i < layers.length; i++) {
-        layers[i].changeNextIncDec(.2);
+     for (int i = 0; i < layers.length/2; i++) {
+        layers[i].changeNextIncDec(wiggleSkyRate);
      }
   } 
+  void wiggleSea()
+  {
+     for (int i = layers.length/2; i < layers.length; i++) {
+        layers[i].changeNextIncDec(wiggleSeaRate);
+     }
+  }
   
   //Fade in light colors, light blue gray, light orange (destaurated)
-  void default_state()
+  void saturate_desaturate(float maxSaturation, float satIncrementRate) //range 0-100
   {
     background(200);
     for (int i = 0; i < layers.length; i++) {
@@ -67,23 +71,43 @@ class Sunset
       layers[i].layer.setStroke(currColor);
     }
     //update curDesaturated    
-    if(isIncDesaturation && curDesaturated < maxDesaturated)
+    if(isIncDesaturation && curDesaturated < maxSaturation)
     {
-      curDesaturated += saturationIncrement;
+      curDesaturated += satIncrementRate;
     }
-    else if( isIncDesaturation && curDesaturated == maxDesaturated)
+    else if( isIncDesaturation && curDesaturated == maxSaturation)
     {
-      curDesaturated -= saturationIncrement;
+      curDesaturated -= satIncrementRate;
       isIncDesaturation = false;
     }
     else if (!isIncDesaturation && curDesaturated > 0)
     {
-      curDesaturated -= saturationIncrement;
+      curDesaturated -= satIncrementRate;
     }
     else if(!isIncDesaturation && curDesaturated == 0)
     {
-      curDesaturated += saturationIncrement;
+      curDesaturated += satIncrementRate;
       isIncDesaturation = true;
+    }
+  }
+  
+  void appear(float satIncrementRate)
+  {
+    background(0);
+    for (int i = 0; i < layers.length; i++) {
+      colorMode(HSB,  360, 100, 100);
+      float h = hue(layers[i].initialColor);
+      float s = map(curDesaturated, 0, 100, 0, saturation(layers[i].initialColor));
+      float b = brightness(layers[i].initialColor);
+      color currColor = color(h, s, b);
+      layers[i].layer.setFill(currColor);
+      layers[i].layer.setFill(currColor);
+      layers[i].layer.setStroke(currColor);
+    }
+    //update curDesaturated    
+    if(curDesaturated < 100)
+    {
+      curDesaturated += satIncrementRate;
     }
   }
 

@@ -25,7 +25,6 @@ class SunsetLayer
   {
 
     PVector v = this.layer.getVertex(changingVertex);
-    //println("isInc:" + isIncreasing + " val:" + currentValue + " y:"  + v.y);
     v.y += currentValue;
     layer.setVertex(changingVertex, new PVector(v.x, v.y));
     if(isIncreasing && currentValue < maxOffset)
