@@ -62,12 +62,19 @@ class Planes{
   }
   
   //Change color to bright green scenes for planes
-  void colorBright(float greening_speed){
+  boolean colorBright(float greening_speed){
+    boolean done = false;
     //println("Draw, color bright by: " + delta);
     for(int i = 0; i< pl.length; i++){ 
     colorMode(HSB, 255);
     color c = pl_col[i];
     color g = pl_col_bg[i];  
+     if (g == c){
+       done = true; 
+      }
+      else {
+        done = false;
+      }  
     
     //if(brightness(g)<brightness(c)){
     //  g = color(hue(c), saturation(c), brightness(g)+delta);
@@ -79,9 +86,9 @@ class Planes{
       pl_col_bg[i] = g;
       pl[i].setFill(g);
       shape(pl[i], i*pl[0].width+3, 0);
-    
     //println("gray: "+i+ " " + brightness(g));
     //println("orig: " + i + " " + brightness(c));
     }
+   return done;
   }
 }

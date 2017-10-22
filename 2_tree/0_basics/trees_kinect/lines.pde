@@ -11,9 +11,24 @@ class Lines{
     dline_r = loadShape("TSQ-01-dline02.svg");    
   }
   
-  void growLineL(){
+  void growLineL(int line_index){
+    //line_index based on left hand movt. count
+    
+    
    //color line_g = color(line_gray);
    dline_l.setFill(255);
+   
+   //0 - lower left, 1 - top left, 2 - top right, 3 - bottom right
+   //if((l_index == 5)|| (l_index == 8)){
+   //PVector ll = dline_l.getVertex(0);
+   //PVector tl = dline_l.getVertex(1);
+   //ll.x += l_index*10;
+   //tl.x += l_index*10;
+   
+   //dline_l.setVertex(0, ll.x, ll.y);
+   //dline_l.setVertex(1, tl.x, tl.y);
+   //}   
+   
    shape(dline_l, plane_width - dline_l.width + 1, height - l_index*80);
    if(l_index < 10){
      l_index++;
@@ -54,7 +69,7 @@ class Lines{
   noStroke();
   fill(255);
   rectMode(CORNERS);
-  rect(plane_width, height, plane_width+10, line_height, 6); //co-ord of one corner, opp corner, radius of corner
-  rect(3*plane_width, height, 3*plane_width+10, line_height, 6);    
+  rect(plane_width, height - 40, plane_width+10, line_height, 6); //co-ord of one corner, opp corner, radius of corner
+  rect(3*plane_width, height - 40, 3*plane_width+10, line_height, 6);    
   }  
 }
