@@ -4,18 +4,16 @@ class Mover {
  PVector acceleration;
  float topspeed;
  color col;
- color orig_col;
  float r; //Radius
  boolean move;
- int col_count = 1;
  
  Mover(){
   //location = new PVector(width/2, height/2);
   location = new PVector(random(width), random(height));
   //velocity = new PVector(random(-2,2), random(-2,2));
   velocity = new PVector(0, 0);
-  topspeed = 5;
-  col = color(random(50,255), random(10,90), 0);
+  topspeed = 2;
+  col = color(random(50,255),random(10, 90), 0);
   r = random(30.0, 90.0);
   //acceleration = new PVector(-0.001,0.01);
 }
@@ -67,13 +65,4 @@ class Mover {
   }
   
   }
-  
-  void setRed(){  
- if(col_count == 1){
-   col = color(random(127, 255), 0, 0);
- }
- col_count++;
-}
-  
-  
 }

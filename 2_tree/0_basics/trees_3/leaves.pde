@@ -3,7 +3,7 @@ class Leaf{
   PShape leaf;
   
   Leaf(boolean left){      
-       if(left){
+    if(left){
       leaf = loadShape("TSQ-01-leaf01.svg");
     }    
     else{
@@ -19,11 +19,7 @@ class Leaf{
   }
   
   void grow(){
- }
-  
-  
-  
-  
-  
+    
+ } 
   
 }

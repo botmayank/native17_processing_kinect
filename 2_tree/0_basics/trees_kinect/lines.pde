@@ -41,6 +41,9 @@ class Lines{
      r_index++;
    } 
   }
+  
+  
+  
   void showLinesD(){
   //colorMode(HSB, 100);
   //HSB = (324, 0, 100);

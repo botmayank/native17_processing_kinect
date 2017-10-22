@@ -57,6 +57,7 @@ void draw(){
       //delay(100);
       lines.baseLinesShow();
       lines.growLineL(5);
+      lines.growLineR();
       //}      
     }    
     

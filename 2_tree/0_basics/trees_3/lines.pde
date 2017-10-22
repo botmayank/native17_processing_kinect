@@ -3,7 +3,7 @@ class Lines{
   int line_gray = 0;
   int line_height; 
   int l_index = 5;
-  int r_index = 6;
+  int r_index = 4;
   
   Lines(){
     vline_1 = loadShape("TSQ-01-vline01.svg");
@@ -35,8 +35,8 @@ class Lines{
    }   
   }
   void growLineR(){
-   shape(dline_r, plane_width - 1, height-r_index*80);
-   if(r_index < 10){
+   shape(dline_r, plane_width + 2, height-r_index*100);
+   if(r_index < 8){
      r_index++;
    } 
   }
