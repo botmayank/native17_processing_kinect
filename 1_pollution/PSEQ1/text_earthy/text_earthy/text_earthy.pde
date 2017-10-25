@@ -3,7 +3,7 @@
   Brief: Pollution is depicted through random circular particles which stick to the human skeleton detected by kinect
   Date:  23-10-2017
   By:    Mayank Joneja - botmayank@gmail.com
-         Ameet Singh - ameet.pearl@gmail.com
+         Ameet Singh -  wayward72@gmail.com
 */
 
 Mover[] movers = new Mover[30];
