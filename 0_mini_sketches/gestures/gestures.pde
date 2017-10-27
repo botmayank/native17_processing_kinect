@@ -5,9 +5,12 @@ import kinect4WinSDK.Kinect;
 import kinect4WinSDK.SkeletonData;
 Kinect kinect;
 ArrayList <SkeletonData> bodies;
+
+//Gestures
 int i_l_hand = Kinect.NUI_SKELETON_POSITION_HAND_LEFT;
 int i_r_hand = Kinect.NUI_SKELETON_POSITION_HAND_RIGHT;
-
+volatile boolean l_upper = false;
+volatile boolean r_upper = false;
 int threshold = 10000; //10k, distance between body center and left/right hand i.e. radius for gesture activation
 
 void setup(){
@@ -39,12 +42,19 @@ void draw(){
      //println(body.position.x);
      //println(body.position.y);
      
-     PVector l_hand_pos = body.skeletonPositions[Kinect.NUI_SKELETON_POSITION_HAND_LEFT];
-     println("Left Hand x,y");
-     println(l_hand_pos.x);
-     println(l_hand_pos.y);
+     //PVector l_hand_pos = body.skeletonPositions[Kinect.NUI_SKELETON_POSITION_HAND_LEFT];
+     //println("Left Hand x,y");
+     //println(l_hand_pos.x);
+     //println(l_hand_pos.y);
      
      updatePositionKinect(body);
+     if(l_upper){
+       println("Left triggered");
+     }
+     if(r_upper){
+       println("Right triggered");
+     }
+     
      //}
    }   
   }  
@@ -106,16 +116,16 @@ void updatePositionKinect(SkeletonData body){
     l_pos.sub(body.position);
     r_pos.sub(body.position);
 
-    boolean l_upper = (l_pos.y < body.position.y*height/2)? true : false;
-    boolean r_upper = (r_pos.y < body.position.y*height/2) ? true : false;
+    l_upper = (l_pos.y < body.position.y*height/2)? true : false;
+    r_upper = (r_pos.y < body.position.y*height/2) ? true : false;
     
     if((l_pos.mag() > threshold) && l_upper){
       //println("Left > thresh");
       fill(0,0,127);
-      ellipse(l_pos.x, l_pos.y, 36, 40);
+      ellipse(l_pos.x, l_pos.y, 56, 60);
     }
     if((r_pos.mag() > threshold) && r_upper){
       fill(0,127,0);
-      ellipse(r_pos.x, r_pos.y, 36, 40);
+      ellipse(r_pos.x, r_pos.y, 56, 60);
     }        
 }
