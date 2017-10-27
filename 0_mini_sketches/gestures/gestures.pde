@@ -19,10 +19,8 @@ void setup(){
   smooth();  
   frameRate(12);
   kinect = new Kinect(this);
-  bodies = new ArrayList<SkeletonData> ();
-    
+  bodies = new ArrayList<SkeletonData> ();    
   println("Gestures");
-
 }
 
 void draw(){
@@ -61,7 +59,6 @@ void draw(){
 }
 
 //Kinect events
-
 void appearEvent(SkeletonData _s) 
 {
   if (_s.trackingState == Kinect.NUI_SKELETON_NOT_TRACKED) 
@@ -124,8 +121,14 @@ void updatePositionKinect(SkeletonData body){
       fill(0,0,127);
       ellipse(l_pos.x, l_pos.y, 56, 60);
     }
+    else{
+      l_upper = false;
+    }
     if((r_pos.mag() > threshold) && r_upper){
       fill(0,127,0);
       ellipse(r_pos.x, r_pos.y, 56, 60);
     }        
+    else{
+      r_upper = false;
+    }
 }
