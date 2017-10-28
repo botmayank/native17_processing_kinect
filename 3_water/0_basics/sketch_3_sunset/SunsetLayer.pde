@@ -20,12 +20,13 @@ class SunsetLayer
     layer.setFill(initialColor);
     layer.setStroke(initialColor);
   }
+
   
   void changeNextIncDec(float rate)
   {
 
     PVector v = this.layer.getVertex(changingVertex);
-    v.y += currentValue;
+    v.y = changingVertexOrigY + currentValue;
     layer.setVertex(changingVertex, new PVector(v.x, v.y));
     if(isIncreasing && currentValue < maxOffset)
     {
