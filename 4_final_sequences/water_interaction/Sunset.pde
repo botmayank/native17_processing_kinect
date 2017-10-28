@@ -7,6 +7,8 @@ class Sunset
   float curDesaturated;
   boolean isIncDesaturation;
   float maxWiggleRate = 5; //just to keep a check on how fast can u wiggle
+  float maxOffset = 3;
+  float minOffset = 1;
   boolean randomBool() {
   return random(1) > .5;
   }
@@ -17,8 +19,7 @@ class Sunset
     nLayers = 6;
     layers = new SunsetLayer[nLayers];
     colorMode(HSB,  360, 100, 100);
-    float maxOffset = 3;
-    float minOffset = 1;
+
     layers[0] = new SunsetLayer(initShape("WSQ-01-sky00.svg"), 2, color(15, 79.9, 83.9), random(minOffset, maxOffset), randomBool());
     layers[1] = new SunsetLayer(initShape("WSQ-01-sky01.svg"), 1, color(24, 79.3, 92.9), random(minOffset, maxOffset), randomBool());
     layers[2] = new SunsetLayer(initShape("WSQ-01-sky02.svg"), 0, color(42, 76.2, 95.7), random(minOffset, maxOffset), randomBool());
@@ -27,6 +28,13 @@ class Sunset
     layers[4] = new SunsetLayer(initShape("WSQ-01-wave04a.svg"), 2, color(191, 59.6, 88.2), random(minOffset, maxOffset), randomBool());
     layers[5] = new SunsetLayer(initShape("WSQ-01-wave05a.svg"), 0, color(188, 100, 83.9), random(minOffset, maxOffset), randomBool());
     
+  }
+      void changeMaxOffset(float offset)
+  {
+    for( int i = 0; i < 6; i++)
+    {
+      layers[i].maxOffset = offset;
+    }
   }
   
   PShape initShape(String file) //workaround as setVertex() doesn't work with object returned by loadShape

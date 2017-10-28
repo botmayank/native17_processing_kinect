@@ -205,6 +205,8 @@ void displayHeader(){
 
 //Show left hand and right hand only if more above body center and sufficiently away from body center
 void checkGestureKinect(SkeletonData body){    
+    float maxOffsetLimit = 30;
+    float maxOffsetRate = 1;
     float wiggle_delta = 0.01;
     PVector l_pos = new PVector(body.skeletonPositions[i_l_hand].x*width, body.skeletonPositions[i_l_hand].y*height);
     PVector r_pos = new PVector(body.skeletonPositions[i_r_hand].x*width, body.skeletonPositions[i_r_hand].y*height);
@@ -222,23 +224,27 @@ void checkGestureKinect(SkeletonData body){
     if((l_pos.mag() > threshold) && l_upper){
       //println("Left up triggered!");
       sunset.wiggleSkyRate = constrain(sunset.wiggleSkyRate + wiggle_delta, 0, sunset.maxWiggleRate);
+      sunset.changeMaxOffset(constrain(sunset.layers[1].maxOffset + maxOffsetRate, sunset.minOffset, maxOffsetLimit));
       }
       
     else{        
         //println("Left down triggered");
         //sunset.wiggleSkyRate = 0;
         sunset.wiggleSkyRate = constrain(sunset.wiggleSkyRate - wiggle_delta, 0, sunset.maxWiggleRate);
+        sunset.changeMaxOffset(constrain(sunset.layers[1].maxOffset - maxOffsetRate, sunset.minOffset, maxOffsetLimit));
       }    
         
     //Right Hand Sea: keep increasing until max, then start from zero
     if((r_pos.mag() > threshold) && r_upper){
       //println("Right up triggered!");
       sunset.wiggleSeaRate = constrain(sunset.wiggleSeaRate + wiggle_delta, 0, sunset.maxWiggleRate);
+      sunset.changeMaxOffset(constrain(sunset.layers[1].maxOffset + maxOffsetRate, sunset.minOffset, maxOffsetLimit));
       }
       else{
         //println("Right down triggered");
         //sunset.wiggleSeaRate = 0;
         sunset.wiggleSeaRate = constrain(sunset.wiggleSeaRate - wiggle_delta, 0, sunset.maxWiggleRate);
+        sunset.changeMaxOffset(constrain(sunset.layers[1].maxOffset - maxOffsetRate, sunset.minOffset, maxOffsetLimit));
       }  
 }
 

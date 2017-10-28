@@ -54,9 +54,15 @@ void keyPressed() {
     sunset.changeMaxOffset(constrain(sunset.layers[1].maxOffset - maxOffsetRate, sunset.minOffset, maxOffsetLimit));
   }
   else if(key == 'i' || key == 'I') //sea up
-    sunset.wiggleSkyRate = constrain(sunset.wiggleSeaRate + 0.1, 0, sunset.maxWiggleRate);
+  {
+    sunset.wiggleSeaRate = constrain(sunset.wiggleSeaRate + 0.1, 0, sunset.maxWiggleRate);
+    sunset.changeMaxOffset(constrain(sunset.layers[1].maxOffset + maxOffsetRate, sunset.minOffset, maxOffsetLimit));
+  }
   else if(key == 'j' || key == 'J') //sea down
-    sunset.wiggleSkyRate = constrain(sunset.wiggleSeaRate - 0.1, 0, sunset.maxWiggleRate);
+  {
+    sunset.wiggleSeaRate = constrain(sunset.wiggleSeaRate - 0.1, 0, sunset.maxWiggleRate);
+    sunset.changeMaxOffset(constrain(sunset.layers[1].maxOffset - maxOffsetRate, sunset.minOffset, maxOffsetLimit));
+  }
   else if(key == 'q' || key == 'Q') //trigger interaction state "I"
     state = 2;
 }
