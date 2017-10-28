@@ -1,9 +1,9 @@
 /*
-  Pollution Sequence 1
+  Pollution Sequence
   Brief: Pollution is depicted through random circular particles which stick to the human skeleton detected by kinect
   Date:  23-10-2017
   By:    Mayank Joneja - botmayank@gmail.com
-         Ameet Singh - ameet.pearl@gmail.com
+         Ameet Singh -  wayward72@gmail.com
          
   Note: Install the TTF font in the data folder for the Subway Ticker font from http://www.1001fonts.com/subway-ticker-font.html
         before running the sketch

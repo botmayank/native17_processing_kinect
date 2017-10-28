@@ -1,12 +1,15 @@
 /*
   Pollution Sequence
   Brief: Pollution is depicted through random circular particles which stick to the human skeleton detected by kinect
-  Date:  23-10-2017
+  Date:  28-10-2017
   By:    Mayank Joneja - botmayank@gmail.com
          Ameet Singh -  wayward72@gmail.com
+         
+  Note: Install the TTF font in the data folder for the Subway Ticker font from http://www.1001fonts.com/subway-ticker-font.html
+        before running the sketch
 */
 
-Mover[] movers = new Mover[30];
+Mover[] movers = new Mover[40];
 
 //Kinect imports
 import kinect4WinSDK.Kinect;
@@ -82,7 +85,7 @@ void appearEvent(SkeletonData _s)
 void disappearEvent(SkeletonData _s) 
 {
   println("Body gone!");
-  //header = false;
+  header = false;
   synchronized(bodies) {
     for (int i=bodies.size ()-1; i>=0; i--) 
     {
@@ -92,7 +95,6 @@ void disappearEvent(SkeletonData _s)
       }
     }
   }
-  randomizeMovers();
 }
 
 void moveEvent(SkeletonData _b, SkeletonData _a) 
@@ -115,33 +117,25 @@ void moveEvent(SkeletonData _b, SkeletonData _a)
 }
 
 void updatePositionKinect(SkeletonData body){
+     int disappear_threshold = 20;     
      PVector body_pos = new PVector(body.position.x*width, body.position.y*height);
      //PVector[] body_part_pos = body.skeletonPositions;
-     if(body_pos.mag() > 10){
-         for(int i = 0; i < movers.length; i++){
-           //PVector pos = new PVector(body_part_pos[i%movers.length].x*width, body_part_pos[i%movers.length].x*height);
-           PVector pos = new PVector(body.skeletonPositions[i%body.skeletonPositions.length].x*width, body.skeletonPositions[i%body.skeletonPositions.length].y*height);
-           fill(0,0,127);
-           ellipse(pos.x, pos.y, 16, 20);
-            movers[i].update(pos);
-            movers[i].checkEdges();
-            movers[i].display();
-        } 
+     
+     if(body_pos.mag() > disappear_threshold){       
+       for(int i = 0; i < movers.length; i++){
+         //PVector pos = new PVector(body_part_pos[i%movers.length].x*width, body_part_pos[i%movers.length].x*height);
+         PVector pos = new PVector(body.skeletonPositions[i%body.skeletonPositions.length].x*width, body.skeletonPositions[i%body.skeletonPositions.length].y*height);
+         fill(0,0,127);
+         ellipse(pos.x, pos.y, 16, 20);
+          movers[i].update(pos);
+          movers[i].checkEdges();
+          movers[i].display();
+      } 
      }
      else{
        randomizeMovers();
      }
 }
-
-void randomizeMovers(){
-  for(int i = 0; i< movers.length; i++){
-    PVector pos = new PVector(random(width), random(height));
-    movers[i].update(pos);
-    movers[i].checkEdges();
-    movers[i].display();
-  }
-}
-
 
 void displayHeader(){  
   // Display headline at x  location
@@ -159,4 +153,13 @@ void displayHeader(){
       x = width; 
       index = (index + 1) % headlines.length;
     }
+}
+
+void randomizeMovers(){
+  PVector pos = new PVector(random(width), random(height));
+  for(int i = 0; i< movers.length; i++){
+        movers[i].update(pos);
+        movers[i].checkEdges();
+        movers[i].display();
+  }
 }
