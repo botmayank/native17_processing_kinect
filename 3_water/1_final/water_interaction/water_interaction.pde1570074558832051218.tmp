@@ -1,17 +1,13 @@
+//Kinect based interaction with water/sunset sequence
+
 /*
-  Water Sequence
-  Brief: An abstract scene with sunset at the sea is shown fading in and out. Upon interaction, the sky and the sea start wiggling about more/less aggressively.
-  Date:  28-10-2017
-         Chitra Singh - chits.26@gmail.com
-  By:    Mayank Joneja - botmayank@gmail.com
-         Ameet Singh -  wayward72@gmail.com
-         
-  Note: Install the TTF font in the data folder for the Subway Ticker font from http://www.1001fonts.com/subway-ticker-font.html
-        before running the sketch
+TODO
+1. Check if smooth() works - It does - DONE 
+2. Check if frameRate limit also slows down Kinect responsiveness - It does - DONE
+3. Add another state for text headline to appear, state = -1 - DONE
+4. Implement gestures to replace W/S and I/J 
+5. Implement A to I transition (based on timer ? if A done and time since A > 2000 ms then I?) - DONE
 */
-
-
-static boolean debug = false;
 
 //Kinect imports
 import kinect4WinSDK.Kinect;
@@ -53,7 +49,8 @@ void setup()
   x = width;
   
   background(0);
-  smooth();  
+  smooth(); //TODO doesn't really work
+  //TODO: Check if it really works and if it also limits Kinect interaction speed
   frameRate(20); //Lower framerate like 10 fps might throw 5000ms error
   
   //Kinect init
@@ -93,8 +90,8 @@ void draw()
           break;
     case 2: //interaction state "I"
           //Make transition to "I" notable
-          //sunset.wiggleSkyRate = sunset.maxWiggleRate - 3.5;
-          //sunset.wiggleSeaRate = sunset.maxWiggleRate - 3.5;
+          //sunset.wiggleSkyRate = sunset.maxWiggleRate - 2;
+          //sunset.wiggleSeaRate = sunset.maxWiggleRate - 2;
           if(first_interaction){            
             sunset.wiggleSkyRate = 0;
             sunset.wiggleSeaRate = 0;
@@ -104,9 +101,7 @@ void draw()
           sunset.wiggleSky();//float rate
           sunset.wiggleSea();//float rate
           sunset.display();
-          if(debug){
-            displayHands();
-          }          
+          displayHands();
           break;   
   }  
 }
@@ -144,12 +139,15 @@ void appearEvent(SkeletonData _s)
   synchronized(bodies) {
     bodies.add(_s);
   }
+  //2 seconds after appear, trigger interaction
+  //delay(2000);
+  //state = 2;  
 }
 
 void disappearEvent(SkeletonData _s) 
 {
   println("Body gone!");
-  state = 0;
+  state = -1;
   synchronized(bodies) {
     for (int i=bodies.size ()-1; i>=0; i--) 
     {
@@ -205,7 +203,7 @@ void displayHeader(){
 
 //Show left hand and right hand only if more above body center and sufficiently away from body center
 void checkGestureKinect(SkeletonData body){    
-    float wiggle_delta = 0.01;
+    float wiggle_delta = 0.001;
     PVector l_pos = new PVector(body.skeletonPositions[i_l_hand].x*width, body.skeletonPositions[i_l_hand].y*height);
     PVector r_pos = new PVector(body.skeletonPositions[i_r_hand].x*width, body.skeletonPositions[i_r_hand].y*height);
     //TODO: Initialize global vectors for l_pos, r_pos correctly which get updated inside this function
@@ -220,25 +218,25 @@ void checkGestureKinect(SkeletonData body){
     
     //Left Hand Sky: keep increasing until max, then start from zero
     if((l_pos.mag() > threshold) && l_upper){
-      //println("Left up triggered!");
+      println("Left up triggered!");
       sunset.wiggleSkyRate = constrain(sunset.wiggleSkyRate + wiggle_delta, 0, sunset.maxWiggleRate);
       }
       
     else{        
-        //println("Left down triggered");
-        //sunset.wiggleSkyRate = 0;
-        sunset.wiggleSkyRate = constrain(sunset.wiggleSkyRate - wiggle_delta, 0, sunset.maxWiggleRate);
+        println("Left down triggered");
+        sunset.wiggleSkyRate = 0;
+        //sunset.wiggleSkyRate = constrain(sunset.wiggleSkyRate - wiggle_delta, 0, sunset.maxWiggleRate);
       }    
         
     //Right Hand Sea: keep increasing until max, then start from zero
     if((r_pos.mag() > threshold) && r_upper){
-      //println("Right up triggered!");
+      println("Right up triggered!");
       sunset.wiggleSeaRate = constrain(sunset.wiggleSeaRate + wiggle_delta, 0, sunset.maxWiggleRate);
       }
       else{
-        //println("Right down triggered");
-        //sunset.wiggleSeaRate = 0;
-        sunset.wiggleSeaRate = constrain(sunset.wiggleSeaRate - wiggle_delta, 0, sunset.maxWiggleRate);
+        println("Right down triggered");
+        sunset.wiggleSeaRate = 0;
+        //sunset.wiggleSeaRate = constrain(sunset.wiggleSeaRate - wiggle_delta, 0, sunset.maxWiggleRate);
       }  
 }
 
