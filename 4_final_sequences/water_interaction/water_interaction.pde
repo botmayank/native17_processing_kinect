@@ -11,7 +11,7 @@
 */
 
 
-static boolean debug = false;
+static boolean debug = true;
 
 //Kinect imports
 import kinect4WinSDK.Kinect;
@@ -246,19 +246,19 @@ void displayHands(){
  noFill();
  if(l_upper){
       fill(0,0,255);
-      ellipse(g_l_pos.x, g_l_pos.y, 56, 60);
+      ellipse(g_l_pos.x, g_l_pos.y, 26, 30);
  }
  else{
       fill(50,50,50);
-      ellipse(g_l_pos.x, g_l_pos.y, 56, 60);
+      ellipse(g_l_pos.x, g_l_pos.y, 26, 30);
  } 
  if(r_upper){
       fill(0,255,0);
-      ellipse(g_r_pos.x, g_r_pos.y, 56, 60);
+      ellipse(g_r_pos.x, g_r_pos.y, 26, 30);
  }
  
  else{
       fill(50,50,50);
-      ellipse(g_r_pos.x, g_r_pos.y, 56, 60);
+      ellipse(g_r_pos.x, g_r_pos.y, 26, 30);
  }  
 }
