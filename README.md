@@ -4,7 +4,6 @@ Based on the work by the amazing folks at Processing https://processing.org/tuto
 
 Media files of both sequences can be found at: https://drive.google.com/open?id=0B53FF4K-yPjBUXJmd2prbFVMSXM
 
-Native 17 Exhibition:
 ![Poster](https://i.imgur.com/0UJttrZ.jpg)
 
 (c) 2017 Mayank Joneja, Chitra Singh, and Ameet Singh
