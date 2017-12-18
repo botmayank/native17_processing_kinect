@@ -6,6 +6,8 @@ class Mover {
  color col;
  float r; //Radius
  boolean move;
+ float rand_width, rand_height;
+ float offshoot = 10.0;
  
  Mover(){
   //location = new PVector(width/2, height/2);
@@ -21,7 +23,7 @@ class Mover {
  void update(PVector destination){
    //PVector mouse = new PVector(mouseX, mouseY);
    PVector dir = PVector.sub(destination, location);
-   if(dir.mag() < 10.0){
+   if(dir.mag() < offshoot){
      move = false;
    }
    else{
@@ -36,7 +38,7 @@ class Mover {
      velocity.add(acceleration);
    }
    else{
-     velocity.set(0.0,0.0);
+     velocity.set(0.2,0.2);
    }    
    
    //velocity.add(acceleration);
