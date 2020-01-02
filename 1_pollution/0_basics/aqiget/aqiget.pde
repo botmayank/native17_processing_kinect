@@ -27,11 +27,11 @@ public void setup()
 }
 
 void draw() {
-  println("AQI value: " + getAqi(city));
+  println("AQI value: " + getAqiVal(city));
   delay(POLLING_INTERVAL * 1000); // milliseconds
 }
 
-int getAqi(String city) {
+JSONObject getAqiData(String city) {
   String AQI_URL = "https://api.waqi.info/feed/" + city + "/?token=" + AQI_TOKEN;
   GetRequest get = new GetRequest(AQI_URL);
   get.send(); // program will wait untill the request is completed
@@ -42,12 +42,21 @@ int getAqi(String city) {
   if(!status.equals("ok")) {
     println("GET request to " + AQI_URL + " failed! Status: " + status);
     println(response.getString("data"));
-    return -1;
+    return null;
   }
   
   //println("response: " + get.getContent());
   
   // Parsing of response
   JSONObject aqidata = response.getJSONObject("data");
-  return aqidata.getInt("aqi");
+  return aqidata;
+}
+
+int getAqiVal(String city) {
+  JSONObject aqidata = getAqiData(city);
+  if(aqidata != null){
+    return aqidata.getInt("aqi");
+  } else {
+    return -1;
+  }    
 }
