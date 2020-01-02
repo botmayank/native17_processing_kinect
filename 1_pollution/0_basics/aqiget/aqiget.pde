@@ -23,11 +23,12 @@ public void setup()
 {
 	size(400,400);
 	smooth();
-  println("Aqidata for " + city + " polled every " + POLLING_INTERVAL + " seconds:");
+  println("Aqidata for " + city + " polled every " + POLLING_INTERVAL + " seconds:");  
 }
 
 void draw() {
   println("AQI value: " + getAqiVal(city));
+  printParticleVals(city);
   delay(POLLING_INTERVAL * 1000); // milliseconds
 }
 
@@ -59,4 +60,20 @@ int getAqiVal(String city) {
   } else {
     return -1;
   }    
+}
+
+void printParticleVals(String city) {
+  JSONObject aqidata = getAqiData(city);
+  if(aqidata != null){
+    JSONObject iaqi = aqidata.getJSONObject("iaqi");
+    
+    String particles[] = {"pm25", "pm10", "co", "o3"};
+    
+    println("===========AQI Details========");    
+    for (String p : particles) {
+      float val = iaqi.getJSONObject(p).getFloat("v");
+      println(p + " value: " + val);
+    }
+    println("==============================");
+  }
 }
