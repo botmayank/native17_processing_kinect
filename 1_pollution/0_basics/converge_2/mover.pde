@@ -8,22 +8,21 @@ class Mover {
  float r; //Radius
  boolean move;
  int col_count = 1;
+ float overshoot_dist = 10.0; //60.0 makes them stop too soon
  
  Mover(){
-  //location = new PVector(width/2, height/2);
   location = new PVector(random(width), random(height));
-  //velocity = new PVector(random(-2,2), random(-2,2));
-  velocity = new PVector(0, 0);
+  velocity = new PVector(random(-2,2), random(-2,2));
+  //velocity = new PVector(0, 0);
   topspeed = 10;
   col = color(random(50,255), random(10,90), 0);
   r = random(30.0, 90.0);
-  //acceleration = new PVector(-0.001,0.01);
 }
  
  void update(PVector destination){
    //PVector mouse = new PVector(mouseX, mouseY);
    PVector dir = PVector.sub(destination, location);
-   if(dir.mag() < 60.0){
+   if(dir.mag() < overshoot_dist){
      move = false;
    }
    else{
