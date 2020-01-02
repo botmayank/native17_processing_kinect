@@ -15,6 +15,11 @@ private static boolean mode_kinect = false; // true: Control with Kinect, false:
 
 static int random_mouse_mode = 2;
 
+// types of particles
+int NO_2_5_PARTICLES = 40, NO_10_PARTICLES = 10;
+Mover[] pm2_5_particles = new Mover[NO_2_5_PARTICLES];
+Mover[] pm10_particles = new Mover[NO_10_PARTICLES];
+
 Mover[] movers = new Mover[20];
 
 //Kinect imports
@@ -29,9 +34,32 @@ void setup(){
   smooth();
   println("Running pollution particle test...");
   
-  // Create new movers
-  for(int i = 0; i < movers.length; i++){ 
-    movers[i] = new Mover();
+  float inertia, speed;
+  // Create new generic movers
+  for(int i = 0; i < movers.length; i++){
+    color col = color(random(50,255), random(10,90), 127);
+    float r = random(30.0, 90.0);
+    inertia = 15.0;
+    speed = 20.0;
+    movers[i] = new Mover(col, r, speed, inertia);
+  }
+  
+  // PM 2.5 particles
+  float r_2_5 = 25.0;
+  inertia = 10.0; // 10.0 makes particles overshoot target a lot
+  speed = 20.0;
+  for(int i = 0; i < pm2_5_particles.length; i++){
+    color col = color(175, 71, 30);
+    pm2_5_particles[i] = new Mover(col, r_2_5, speed, inertia);
+  }
+  
+  // PM 10 particles
+  float r_10 = 100.0;
+  inertia = 60.0;
+  speed = 10.0;
+  for(int i = 0; i < pm10_particles.length; i++){
+    color col = color(127, 173, 51);
+    pm10_particles[i] = new Mover(col, r_10, speed, inertia);
   }
   
   // Other initializations  
@@ -92,11 +120,27 @@ void draw(){
     }
     
     PVector mouse_pos = new PVector(target_x, target_y);
-    for(int i = 0; i < movers.length; i++){
-        movers[i].update(mouse_pos);
-        movers[i].checkEdges();
-        movers[i].display();
-    }    
+    
+    // Normal Movers
+    //for(int i = 0; i < movers.length; i++){
+    //    movers[i].update(mouse_pos);
+    //    movers[i].checkEdges();
+    //    movers[i].display();
+    //}
+    
+    // PM 2.5 particles
+    for(int i = 0; i < pm2_5_particles.length; i++){
+        pm2_5_particles[i].update(mouse_pos);
+        pm2_5_particles[i].checkEdges();
+        pm2_5_particles[i].display();
+    }
+    
+    // PM 10 particles
+    for(int i = 0; i < pm10_particles.length; i++){
+        pm10_particles[i].update(mouse_pos);
+        pm10_particles[i].checkEdges();
+        pm10_particles[i].display();
+    }
   }  
 }
 

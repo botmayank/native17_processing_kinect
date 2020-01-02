@@ -8,15 +8,15 @@ class Mover {
  float r; //Radius
  boolean move;
  int col_count = 1;
- float overshoot_dist = 10.0; //60.0 makes them stop too soon
+ float overshoot_dist; //60.0 makes them stop too soon, 10.0 makes them overshoot
  
- Mover(){
+ Mover(color c, float radius, float max_speed, float inertia){
   location = new PVector(random(width), random(height));
   velocity = new PVector(random(-2,2), random(-2,2));
-  //velocity = new PVector(0, 0);
-  topspeed = 10;
-  col = color(random(50,255), random(10,90), 0);
-  r = random(30.0, 90.0);
+  topspeed = max_speed;
+  col = c;
+  r = radius;
+  overshoot_dist = inertia;
 }
  
  void update(PVector destination){
@@ -65,14 +65,5 @@ class Mover {
    location.y = height; 
   }
   
-  }
-  
-  void setRed(){  
- if(col_count == 1){
-   col = color(random(127, 255), 0, 0);
- }
- col_count++;
-}
-  
-  
-}
+  }  
+} // class Mover
