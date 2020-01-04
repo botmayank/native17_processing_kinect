@@ -45,20 +45,23 @@ To search for station-id, change the keyword field in:
 */
 
 //Particle globals
-Mover[] movers = new Mover[30];
+ArrayList<Mover> movers;
+int MAX_MOVERS = 20;
 
 void setup(){
   size(1920, 1080, P3D);
   background(0);
   smooth();
   
+  movers = new ArrayList<Mover>();
+  
   float inertia, speed;  
-  for(int i = 0; i < movers.length; i++){
+  for(int i = 0; i < MAX_MOVERS; i++){
     color col = color(random(50,255), random(10,90), 127);
     float r = random(30.0, 90.0);
     inertia = 15.0;
     speed = 20.0;
-    movers[i] = new Mover(col, r, speed, inertia);
+    movers.add(new Mover(col, r, speed, inertia));
   }
   
   kinect = new Kinect(this);
@@ -114,10 +117,8 @@ void followMouse(int random_mouse_mode) {
   
   PVector mouse_pos = new PVector(target_x, target_y);    
   // Normal Movers
-  for(int i = 0; i < movers.length; i++){
-      movers[i].update(mouse_pos);
-      movers[i].checkEdges();
-      movers[i].display();
+  for(int i = 0; i < movers.size(); i++){
+      movers.get(i).update(mouse_pos);
   }
 }
 
@@ -187,12 +188,12 @@ void updatePositionKinect(SkeletonData body){
      PVector body_pos = new PVector(body.position.x*width, body.position.y*height);
      //PVector[] body_part_pos = body.skeletonPositions;
      if(body_pos.mag() > 10){ // not at the edge of the screen/partially out
-         for(int i = 0; i < movers.length; i++){
+         for(int i = 0; i < movers.size(); i++){
            //PVector pos = new PVector(body_part_pos[i%movers.length].x*width, body_part_pos[i%movers.length].x*height);
            PVector pos = new PVector(body.skeletonPositions[i%body.skeletonPositions.length].x*width, body.skeletonPositions[i%body.skeletonPositions.length].y*height);
            fill(0,0,127);
            ellipse(pos.x, pos.y, 16, 20);
-            movers[i].update(pos);
+            movers.get(i).update(pos);
         } 
      }
      else{
@@ -201,9 +202,9 @@ void updatePositionKinect(SkeletonData body){
 }
 
 void randomizeMovers(){
-  for(int i = 0; i< movers.length; i++){
+  for(int i = 0; i< movers.size(); i++){
     PVector pos = new PVector(random(width), random(height));
-    movers[i].update(pos);
+    movers.get(i).update(pos);
   }
 }
 
