@@ -32,36 +32,72 @@ int headline_index = 0;
 
 //AQI globals
 String AQI_TOKEN = "ENTER-TOKEN-HERE"; // Token generated from waqi.info
-
-int POLLING_INTERVAL = 2; // Don't go faster than once per second preferably
-
+int POLLING_INTERVAL = 2; // Seconds
 //String city = "delhi"; //city name or @station-id
 String city = "@2556"; //R.K. Puram
 
-/* 
-To search for station-id, change the keyword field in:
-  https://api.waqi.info//search/?token=ENTER_TOKEN_HERE&keyword=rk puram
-  Take the "uid" parameter.
-*/
-
 //Particle globals
-ArrayList<Mover> movers;
-int MAX_MOVERS = 20;
+ArrayList<Mover> movers, pm25_particles, pm10_particles; //movers are all other gases
+int MAX_MOVERS = 150;
+int MAX_PM_25 = 50;
+int MAX_PM_10 = 50;
+int AQI_MAX = 600;
 
 void setup(){
   size(1920, 1080, P3D);
   background(0);
   smooth();
   
-  movers = new ArrayList<Mover>();
+  /* Find out AQI for PM2.5 and PM10 */
+  println("Getting AQI Data for station-id: " + city);
+  int aqi_num = getAqiVal(city);
+  println("AQI single value: " + aqi_num);
   
-  float inertia, speed;  
-  for(int i = 0; i < MAX_MOVERS; i++){
-    color col = color(random(50,255), random(10,90), 127);
-    float r = random(30.0, 90.0);
+  FloatList aqivals = getParticleVals(city);
+  float aqi_num_25 = aqivals.get(0); // pm 2.5
+  float aqi_num_10 = aqivals.get(1); // pm 10
+  println("No. of PM2.5 particles: " + aqi_num_25 + " pm10 particles: " + aqi_num_10 );
+  
+  /* Initialize particles for PM10 and PM2.5 */  
+  int num_25 = int(map(aqi_num_25, 0, AQI_MAX, 0, MAX_PM_25));
+  int num_10 = int(map(aqi_num_10, 0, AQI_MAX, 0, MAX_PM_10));  
+  int num_gases = MAX_MOVERS - (num_25 + num_10);
+  
+  println("Initializing particles with: ");
+  println("#gases = " + num_gases);
+  println("#PM2.5 particles = " + num_25);
+  println("#PM10 particles = " + num_10);
+  println("Assuming MAX_AQI = " + AQI_MAX);
+  
+  movers = new ArrayList<Mover>();
+  pm25_particles = new ArrayList<Mover>();
+  pm10_particles = new ArrayList<Mover>();
+  
+  float inertia, speed;
+  for(int i = 0; i < num_gases; i++){
+    color col = color(random(50,255), random(10,90), 0);
+    float r = random(5.0, 10.0);
     inertia = 15.0;
     speed = 20.0;
     movers.add(new Mover(col, r, speed, inertia));
+  }
+  
+  //PM10
+  for(int i = 0; i < num_10; i++){
+    color col = color(#B9AE6F);
+    float r = 50.0;
+    inertia = 40.0;
+    speed = 10.0;
+    pm10_particles.add(new Mover(col, r, speed, inertia));
+  }
+  
+  //PM2.5
+  for(int i = 0; i < num_25; i++){
+    color col = color(#B9A113);
+    float r = 20.0;
+    inertia = 25.0;
+    speed = 15.0;
+    pm25_particles.add(new Mover(col, r, speed, inertia));
   }
   
   kinect = new Kinect(this);
@@ -71,8 +107,6 @@ void setup(){
   text_f = createFont("Subway Ticker",30,true);  
   // Initialize headline offscreen to the right 
   text_x = width;
-  
-  printParticleVals(city);
 }
 
 void draw(){
@@ -119,6 +153,16 @@ void followMouse(int random_mouse_mode) {
   // Normal Movers
   for(int i = 0; i < movers.size(); i++){
       movers.get(i).update(mouse_pos);
+  }
+  
+  //PM2.5
+  for(int i = 0; i < pm25_particles.size(); i++){
+      pm25_particles.get(i).update(mouse_pos);
+  }
+  
+  //PM10
+  for(int i = 0; i < pm10_particles.size(); i++){
+      pm10_particles.get(i).update(mouse_pos);
   }
 }
 
@@ -260,6 +304,24 @@ int getAqiVal(String city) {
   } else {
     return -1;
   }    
+}
+
+FloatList getParticleVals(String city) {
+  // Returns a float list of particle vals: "pm25", "pm10", "co", "o3"
+  
+  FloatList vals = new FloatList();  
+  JSONObject aqidata = getAqiData(city);
+  
+  if(aqidata != null){
+    JSONObject iaqi = aqidata.getJSONObject("iaqi");  
+    String particles[] = {"pm25", "pm10", "co", "o3"};
+        
+    for (String p : particles) {
+      float val = iaqi.getJSONObject(p).getFloat("v");
+      vals.append(val);
+    }
+  }  
+  return vals;
 }
 
 void printParticleVals(String city) {
