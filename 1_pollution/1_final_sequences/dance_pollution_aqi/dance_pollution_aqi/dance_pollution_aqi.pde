@@ -7,18 +7,18 @@
          Ameet Singh -  wayward72@gmail.com
 */
 
+import kinect4WinSDK.Kinect;
+import kinect4WinSDK.SkeletonData;
+import http.requests.*;
+
 // Config
 private static boolean mode_kinect = false; // true: Control with Kinect, false: Control with mouse
 
-Mover[] movers = new Mover[30];
-
-//Kinect imports
-import kinect4WinSDK.Kinect;
-import kinect4WinSDK.SkeletonData;
+//Kinect globals
 Kinect kinect;
 ArrayList <SkeletonData> bodies;
 
-//Text init
+//Text globals
 String[] headlines = {
   "DANCE TO THE POLLUTION", 
   "A new study shows that pollution is quite democratic.",
@@ -28,15 +28,31 @@ PFont text_f;  // Global font variable
 float text_x;  // horizontal location of headline
 int text_speed = 2;
 volatile boolean header = true;
+int headline_index = 0;
 
-int index = 0;
+//AQI globals
+String AQI_TOKEN = "ENTER-TOKEN-HERE"; // Token generated from waqi.info
+
+int POLLING_INTERVAL = 2; // Don't go faster than once per second preferably
+
+//String city = "delhi"; //city name or @station-id
+String city = "@2556"; //R.K. Puram
+
+/* 
+To search for station-id, change the keyword field in:
+  https://api.waqi.info//search/?token=ENTER_TOKEN_HERE&keyword=rk puram
+  Take the "uid" parameter.
+*/
+
+//Particle globals
+Mover[] movers = new Mover[30];
 
 void setup(){
   size(1920, 1080, P3D);
   background(0);
   smooth();
-  float inertia, speed;
   
+  float inertia, speed;  
   for(int i = 0; i < movers.length; i++){
     color col = color(random(50,255), random(10,90), 127);
     float r = random(30.0, 90.0);
@@ -44,13 +60,16 @@ void setup(){
     speed = 20.0;
     movers[i] = new Mover(col, r, speed, inertia);
   }
+  
   kinect = new Kinect(this);
   bodies = new ArrayList<SkeletonData> ();
     
   println("AQI and pollutant data sequence by Mayank Joneja, Ameet Singh");
   text_f = createFont("Subway Ticker",30,true);  
   // Initialize headline offscreen to the right 
-  text_x = width; 
+  text_x = width;
+  
+  printParticleVals(city);
 }
 
 void draw(){
@@ -102,7 +121,7 @@ void followMouse(int random_mouse_mode) {
   }
 }
 
-//Kinect events
+/*******************Kinect Methods*******************/
 void showBody() {
   noStroke();
   fill(0, 20); //black, alpha
@@ -188,7 +207,7 @@ void randomizeMovers(){
   }
 }
 
-
+/*******************Ticker Header Methods*******************/
 void displayHeader(){
     background(0);
     fill(#ff0000);
@@ -196,16 +215,64 @@ void displayHeader(){
     // Display headline at text_x location
     textFont(text_f, 64);        
     textAlign(LEFT);
-    text(headlines[index], text_x,height/2); 
+    text(headlines[headline_index], text_x,height/2); 
   
     // Decrement x
     text_x = text_x - text_speed;
   
     // If x is less than the negative width, 
     // then it is off the screen
-    float w = textWidth(headlines[index]);
+    float w = textWidth(headlines[headline_index]);
     if (text_x < -w) {
       text_x = width; 
-      index = (index + 1) % headlines.length;
+      headline_index = (headline_index + 1) % headlines.length;
     }
+}
+
+/************************AQI Methods*************************/
+
+JSONObject getAqiData(String city) {
+  String AQI_URL = "https://api.waqi.info/feed/" + city + "/?token=" + AQI_TOKEN;
+  GetRequest get = new GetRequest(AQI_URL);
+  get.send(); // program will wait untill the request is completed
+
+  JSONObject response = parseJSONObject(get.getContent());
+  
+  String status = response.getString("status");
+  if(!status.equals("ok")) {
+    println("GET request to " + AQI_URL + " failed! Status: " + status);
+    println(response.getString("data"));
+    return null;
+  }
+  
+  //println("response: " + get.getContent());
+  
+  // Parsing of response
+  JSONObject aqidata = response.getJSONObject("data");
+  return aqidata;
+}
+
+int getAqiVal(String city) {
+  JSONObject aqidata = getAqiData(city);
+  if(aqidata != null){
+    return aqidata.getInt("aqi");
+  } else {
+    return -1;
+  }    
+}
+
+void printParticleVals(String city) {
+  JSONObject aqidata = getAqiData(city);
+  if(aqidata != null){
+    JSONObject iaqi = aqidata.getJSONObject("iaqi");
+    
+    String particles[] = {"pm25", "pm10", "co", "o3"};
+    
+    println("===========AQI Details========");    
+    for (String p : particles) {
+      float val = iaqi.getJSONObject(p).getFloat("v");
+      println(p + " value: " + val);
+    }
+    println("==============================");
+  }
 }
