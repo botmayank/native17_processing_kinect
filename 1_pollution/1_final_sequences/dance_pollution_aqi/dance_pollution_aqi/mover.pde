@@ -43,7 +43,8 @@ class Mover {
    //velocity.add(acceleration);
    velocity.limit(topspeed);
    location.add(velocity); 
-  
+   checkEdges();
+   display();
  }
   
   void display(){
@@ -53,17 +54,16 @@ class Mover {
   }
   
   void checkEdges(){
-  if (location.x > width){
-   location.x = 0;
-  } else if(location.x < 0) {
-   location.x = width; 
-  }
+    if (location.x > width){
+      location.x = 0;
+    } else if(location.x < 0) {
+     location.x = width; 
+    }
   
-  if(location.y > height){
-   location.y = 0;
-  } else if (location.y < 0) {
-   location.y = height; 
+    if(location.y > height){
+     location.y = 0;
+    } else if (location.y < 0) {
+     location.y = height; 
+    }  
   }
-  
-  }  
 } // class Mover

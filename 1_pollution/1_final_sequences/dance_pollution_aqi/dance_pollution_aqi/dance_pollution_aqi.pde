@@ -21,52 +21,54 @@ String[] headlines = {
   "A new study shows that pollution is quite democratic.",
   };
 
-PFont f;  // Global font variable
-float x;  // horizontal location of headline
-int index = 0;
+PFont text_f;  // Global font variable
+float text_x;  // horizontal location of headline
 int text_speed = 2;
-
 volatile boolean header = true;
-  
+
+int index = 0;
+
 void setup(){
   size(1920, 1080, P3D);
   background(0);
-  smooth();  
+  smooth();
+  float inertia, speed;
+  
   for(int i = 0; i < movers.length; i++){
-    movers[i] = new Mover();
+    color col = color(random(50,255), random(10,90), 127);
+    float r = random(30.0, 90.0);
+    inertia = 15.0;
+    speed = 20.0;
+    movers[i] = new Mover(col, r, speed, inertia);
   }
   kinect = new Kinect(this);
   bodies = new ArrayList<SkeletonData> ();
     
   println("Earthy Colors Pollution sequence by Mayank Joneja, Ameet Singh");
-  f = createFont("Subway Ticker",30,true);  
+  text_f = createFont("Subway Ticker",30,true);  
   // Initialize headline offscreen to the right 
-  x = width; 
+  text_x = width; 
 }
 
 void draw(){
   //If no bodies, show Header 
   if(header == true){
-    background(0);
-    fill(#ff0000);
     displayHeader(); 
-  }
-  else{
-  noStroke();
-  fill(0, 20);
-  rect(0, 0, width, height);
-  SkeletonData body;
-  //if body detected    
+  } else{
+    noStroke();
+    fill(0, 20);
+    rect(0, 0, width, height);
+    SkeletonData body;
+    //if body detected    
     if (bodies.size() != 0){
-     int bodyIndex = bodies.size() - 1;
-     body = bodies.get(bodyIndex);
-     updatePositionKinect(body);      
-    } 
+      int bodyIndex = bodies.size() - 1;
+      body = bodies.get(bodyIndex);
+      updatePositionKinect(body);      
+    }
   }
 }
 
 //Kinect events
-
 void appearEvent(SkeletonData _s) 
 {
   if (_s.trackingState == Kinect.NUI_SKELETON_NOT_TRACKED) 
@@ -125,8 +127,6 @@ void updatePositionKinect(SkeletonData body){
            fill(0,0,127);
            ellipse(pos.x, pos.y, 16, 20);
             movers[i].update(pos);
-            movers[i].checkEdges();
-            movers[i].display();
         } 
      }
      else{
@@ -138,26 +138,27 @@ void randomizeMovers(){
   for(int i = 0; i< movers.length; i++){
     PVector pos = new PVector(random(width), random(height));
     movers[i].update(pos);
-    movers[i].checkEdges();
-    movers[i].display();
   }
 }
 
 
-void displayHeader(){  
-  // Display headline at x  location
-    textFont(f, 64);        
+void displayHeader(){
+    background(0);
+    fill(#ff0000);
+    
+    // Display headline at text_x location
+    textFont(text_f, 64);        
     textAlign(LEFT);
-    text(headlines[index],x,height/2); 
+    text(headlines[index], text_x,height/2); 
   
     // Decrement x
-    x = x - text_speed;
+    text_x = text_x - text_speed;
   
     // If x is less than the negative width, 
     // then it is off the screen
     float w = textWidth(headlines[index]);
-    if (x < -w) {
-      x = width; 
+    if (text_x < -w) {
+      text_x = width; 
       index = (index + 1) % headlines.length;
     }
 }
