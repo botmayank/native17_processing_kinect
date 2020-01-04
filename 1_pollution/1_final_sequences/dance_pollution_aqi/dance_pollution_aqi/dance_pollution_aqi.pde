@@ -232,13 +232,22 @@ void updatePositionKinect(SkeletonData body){
      PVector body_pos = new PVector(body.position.x*width, body.position.y*height);
      //PVector[] body_part_pos = body.skeletonPositions;
      if(body_pos.mag() > 10){ // not at the edge of the screen/partially out
-         for(int i = 0; i < movers.size(); i++){
+         //PM2.5 stick to human
+         for(int i = 0; i < pm25_particles.size(); i++){
            //PVector pos = new PVector(body_part_pos[i%movers.length].x*width, body_part_pos[i%movers.length].x*height);
            PVector pos = new PVector(body.skeletonPositions[i%body.skeletonPositions.length].x*width, body.skeletonPositions[i%body.skeletonPositions.length].y*height);
            fill(0,0,127);
            ellipse(pos.x, pos.y, 16, 20);
-            movers.get(i).update(pos);
-        } 
+           pm25_particles.get(i).update(pos);
+        }
+        //PM 10 and movers random
+        PVector pos = new PVector(random(width), random(height));
+        for(int i = 0; i < pm10_particles.size(); i++){
+          pm10_particles.get(i).update(pos);
+        }
+        for(int i = 0; i < movers.size(); i++){
+          movers.get(i).update(pos);
+        }        
      }
      else{
        randomizeMovers();
@@ -246,9 +255,19 @@ void updatePositionKinect(SkeletonData body){
 }
 
 void randomizeMovers(){
+  PVector pos = new PVector(random(width), random(height));
   for(int i = 0; i< movers.size(); i++){
-    PVector pos = new PVector(random(width), random(height));
     movers.get(i).update(pos);
+  }
+  
+  //PM2.5
+  for(int i = 0; i < pm25_particles.size(); i++){
+      pm25_particles.get(i).update(pos);
+  }
+  
+  //PM10
+  for(int i = 0; i < pm10_particles.size(); i++){
+      pm10_particles.get(i).update(pos);
   }
 }
 
