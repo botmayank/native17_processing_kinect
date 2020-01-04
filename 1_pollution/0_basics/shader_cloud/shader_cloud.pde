@@ -12,16 +12,18 @@ PImage cloud3;
 
 float weight = 100;
 int target_x = 0, target_y = 0;
+int y_margin = 50;
+int frame_counter = 0;
 
 void setup() {
-  size(640, 360, P3D);
+  size(1440, 960, P3D);
   
   pointShader = loadShader("spritefrag.glsl", "spritevert.glsl");
   pointShader.set("weight", weight);
   cloud1 = loadImage("cloud1.png");
   cloud2 = loadImage("cloud2.png");
   cloud3 = loadImage("cloud3.png");
-  pointShader.set("sprite", cloud1);
+  pointShader.set("sprite", cloud2);
     
   strokeWeight(weight);
   strokeCap(SQUARE);
@@ -31,16 +33,22 @@ void setup() {
 }
 
 void draw() {
+  
   shader(pointShader, POINTS);
+  if(frame_counter <= 300) {
+    target_y = int(random(2 * height/3 + 100, height));
+  } else {
+    target_y = int(random(2 * height/3, height));
+  }
   
-  target_x = int(random(width));
-  target_y = int(random(height));
+  //target_x = int(random(width));
   
-  target_x = (target_x > width)? width : target_x;
-  target_x = (target_x < 0) ? 0 : target_x;
+  target_y = int(random(target_y - y_margin, target_y + y_margin));
   
-  target_y = (target_y > height)? height : target_y;
-  target_y = (target_y < 0) ? 0 : target_y;
-  
-  point(target_x, target_y);
+  target_x += 3;
+  if (target_x >= width) target_x = 0;
+  if(!mousePressed)
+    point(target_x, target_y);
+    
+  frame_counter++;
 }
