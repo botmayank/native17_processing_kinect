@@ -7,6 +7,9 @@
          Ameet Singh -  wayward72@gmail.com
 */
 
+// Config
+private static boolean mode_kinect = false; // true: Control with Kinect, false: Control with mouse
+
 Mover[] movers = new Mover[30];
 
 //Kinect imports
@@ -44,31 +47,75 @@ void setup(){
   kinect = new Kinect(this);
   bodies = new ArrayList<SkeletonData> ();
     
-  println("Earthy Colors Pollution sequence by Mayank Joneja, Ameet Singh");
+  println("AQI and pollutant data sequence by Mayank Joneja, Ameet Singh");
   text_f = createFont("Subway Ticker",30,true);  
   // Initialize headline offscreen to the right 
   text_x = width; 
 }
 
 void draw(){
-  //If no bodies, show Header 
-  if(header == true){
-    displayHeader(); 
-  } else{
-    noStroke();
-    fill(0, 20);
-    rect(0, 0, width, height);
-    SkeletonData body;
-    //if body detected    
-    if (bodies.size() != 0){
-      int bodyIndex = bodies.size() - 1;
-      body = bodies.get(bodyIndex);
-      updatePositionKinect(body);      
+  if(mode_kinect){
+    //If no bodies, show Header
+    if(header == true){
+      displayHeader(); 
+    } else {
+      showBody();
     }
+  } else { //mouse mode
+    followMouse(1); 
+  }
+}
+
+//Mouse mode
+void followMouse(int random_mouse_mode) {  
+  // Random movement mode (only used when mode_kinect = false)
+  //0: No randomness, exactly follows mouse
+  //1: Follows mouse with some randomness
+  //2: Disregards mouse, totally random target positions
+
+  int target_x = 0, target_y = 0;
+  // Clear screen and do alpha blending
+  noStroke();
+  fill(0,20);
+  rect(0, 0, width, height);
+  
+  if(random_mouse_mode == 0){
+    // Follow mouse exactly
+    target_x = mouseX;
+    target_y = mouseY;
+  } else if(random_mouse_mode == 1) {
+    // Follow mouse with some randomness
+    target_x = mouseX + int(random(width/4));
+    target_y = mouseY + int(random(height/4));
+  } else {
+   // Totally random target position
+   target_x = int(random(width));
+   target_y = int(random(height)); 
+  }
+  
+  PVector mouse_pos = new PVector(target_x, target_y);    
+  // Normal Movers
+  for(int i = 0; i < movers.length; i++){
+      movers[i].update(mouse_pos);
+      movers[i].checkEdges();
+      movers[i].display();
   }
 }
 
 //Kinect events
+void showBody() {
+  noStroke();
+  fill(0, 20); //black, alpha
+  rect(0, 0, width, height);
+  SkeletonData body;
+  //if body detected    
+  if (bodies.size() != 0){
+    int bodyIndex = bodies.size() - 1;
+    body = bodies.get(bodyIndex);
+    updatePositionKinect(body);      
+  }
+}
+
 void appearEvent(SkeletonData _s) 
 {
   if (_s.trackingState == Kinect.NUI_SKELETON_NOT_TRACKED) 
@@ -120,7 +167,7 @@ void moveEvent(SkeletonData _b, SkeletonData _a)
 void updatePositionKinect(SkeletonData body){
      PVector body_pos = new PVector(body.position.x*width, body.position.y*height);
      //PVector[] body_part_pos = body.skeletonPositions;
-     if(body_pos.mag() > 10){
+     if(body_pos.mag() > 10){ // not at the edge of the screen/partially out
          for(int i = 0; i < movers.length; i++){
            //PVector pos = new PVector(body_part_pos[i%movers.length].x*width, body_part_pos[i%movers.length].x*height);
            PVector pos = new PVector(body.skeletonPositions[i%body.skeletonPositions.length].x*width, body.skeletonPositions[i%body.skeletonPositions.length].y*height);
