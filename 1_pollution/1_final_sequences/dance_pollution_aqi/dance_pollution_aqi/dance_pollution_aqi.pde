@@ -34,7 +34,6 @@ int headline_index = 0;
 String AQI_TOKEN = "ENTER-TOKEN-HERE"; // Token generated from waqi.info
 
 int POLLING_INTERVAL = 2; // Seconds
-//String city = "delhi"; //city name or @station-id
 //String city = "@2556"; //R.K. Puram
 String city = "@1929"; //Aichi, Japan
 
@@ -55,8 +54,9 @@ void setup(){
   int aqi_num = getAqiVal(city);  
   int aqi_hue = getAqiCategoryHue(aqi_num); // hue in 360 deg
   aqi_hue = int(map(aqi_hue, 0, 360, 0, 100));
-  println("AQI single value: " + aqi_num + " AQI Hue (0-100): " + aqi_hue);  
+  println("AQI single value: " + aqi_num + " AQI Hue (0-100): " + aqi_hue); 
   
+  printParticleVals(city);
   FloatList aqivals = getParticleVals(city);
   float aqi_num_25 = aqivals.get(0); // pm 2.5
   float aqi_num_10 = aqivals.get(1); // pm 10
@@ -64,8 +64,11 @@ void setup(){
   
   /* Initialize particles for PM10 and PM2.5 */  
   int num_25 = int(map(aqi_num_25, 0, AQI_MAX, 0, MAX_PM_25));
-  int num_10 = int(map(aqi_num_10, 0, AQI_MAX, 0, MAX_PM_10));  
+  int num_10 = int(map(aqi_num_10, 0, AQI_MAX, 0, MAX_PM_10));
+  
   int num_gases = MAX_MOVERS - (num_25 + num_10);
+  float num_aqi_gases = aqivals.get(2) + aqivals.get(3);
+  num_gases = int(map(num_aqi_gases, 0, 100, 0, num_gases));
   
   println("Initializing particles with: ");
   println("#gases = " + num_gases);
