@@ -32,9 +32,11 @@ int headline_index = 0;
 
 //AQI globals
 String AQI_TOKEN = "ENTER-TOKEN-HERE"; // Token generated from waqi.info
+
 int POLLING_INTERVAL = 2; // Seconds
 //String city = "delhi"; //city name or @station-id
-String city = "@2556"; //R.K. Puram
+//String city = "@2556"; //R.K. Puram
+String city = "@1929"; //Aichi, Japan
 
 //Particle globals
 ArrayList<Mover> movers, pm25_particles, pm10_particles; //movers are all other gases
@@ -50,8 +52,10 @@ void setup(){
   
   /* Find out AQI for PM2.5 and PM10 */
   println("Getting AQI Data for station-id: " + city);
-  int aqi_num = getAqiVal(city);
-  println("AQI single value: " + aqi_num);
+  int aqi_num = getAqiVal(city);  
+  int aqi_hue = getAqiCategoryHue(aqi_num); // hue in 360 deg
+  aqi_hue = int(map(aqi_hue, 0, 360, 0, 100));
+  println("AQI single value: " + aqi_num + " AQI Hue (0-100): " + aqi_hue);  
   
   FloatList aqivals = getParticleVals(city);
   float aqi_num_25 = aqivals.get(0); // pm 2.5
@@ -84,7 +88,9 @@ void setup(){
   
   //PM10
   for(int i = 0; i < num_10; i++){
-    color col = color(#B9AE6F);
+    //color col = color(#B9AE6F);
+    colorMode(HSB, 100);
+    color col = color(aqi_hue, 50, 50);
     float r = 50.0;
     inertia = 40.0;
     speed = 10.0;
@@ -93,7 +99,9 @@ void setup(){
   
   //PM2.5
   for(int i = 0; i < num_25; i++){
-    color col = color(#B9A113);
+    //color col = color(#B9A113);
+    colorMode(HSB, 100);
+    color col = color(aqi_hue, 80, 80);
     float r = 20.0;
     inertia = 25.0;
     speed = 15.0;
@@ -357,4 +365,29 @@ void printParticleVals(String city) {
     }
     println("==============================");
   }
+}
+
+int getAqiCategoryHue(int aqi_num) {
+  int aqi_cat = 0;
+  int[] aqi_level =  {0, 51, 101, 151, 201, 301};
+  int[] aqi_colors = {119, 60, 33, 0, 283, 336 }; // HSV Hue values
+  
+  if(aqi_num > aqi_level[0] && aqi_num < aqi_level[1]) {
+    aqi_cat = 0; // Good - Green
+  } else if(aqi_num > aqi_level[1] && aqi_num < aqi_level[2]) {
+    aqi_cat = 1; // Moderate - Yellow
+  } else if(aqi_num > aqi_level[2] && aqi_num < aqi_level[3]) {
+    aqi_cat = 2; // Unhealthy for sensitive groups - Orange
+  } else if(aqi_num > aqi_level[3] && aqi_num < aqi_level[4]) {
+    aqi_cat = 3; // Unhealthy - Red
+  } else if(aqi_num > aqi_level[4] && aqi_num < aqi_level[5]) {
+    aqi_cat = 4; // Very Unhealthy - Purple 
+  } else if(aqi_num > aqi_level[5]) {
+    aqi_cat = 5; // Hazardous - Maroon
+  } else {
+    println("Unexpected aqi_num: " + aqi_num);
+    aqi_cat = 5;
+  }
+  
+  return aqi_colors[aqi_cat];
 }
