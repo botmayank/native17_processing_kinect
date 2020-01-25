@@ -12,7 +12,7 @@ import kinect4WinSDK.SkeletonData;
 import http.requests.*;
 
 // Config
-private static boolean mode_kinect = false; // true: Control with Kinect, false: Control with mouse
+private static boolean mode_kinect = true; // true: Control with Kinect, false: Control with mouse
 
 //Kinect globals
 Kinect kinect;
@@ -34,18 +34,18 @@ int headline_index = 0;
 String AQI_TOKEN = "ENTER-TOKEN-HERE"; // Token generated from waqi.info
 
 int POLLING_INTERVAL = 2; // Seconds
-//String city = "@2556"; //R.K. Puram
-String city = "@1929"; //Aichi, Japan
+String city = "@2556"; //R.K. Puram
+//String city = "@1929"; //Aichi, Japan
 
 //Particle globals
 ArrayList<Mover> movers, pm25_particles, pm10_particles; //movers are all other gases
 int MAX_MOVERS = 150;
-int MAX_PM_25 = 50;
-int MAX_PM_10 = 50;
+int MAX_PM_25 = 100;
+int MAX_PM_10 = 100;
 int AQI_MAX = 600;
 
 void setup(){
-  size(1920, 1080, P3D);
+  fullScreen();
   background(0);
   smooth();
   
@@ -63,8 +63,9 @@ void setup(){
   println("No. of PM2.5 particles: " + aqi_num_25 + " pm10 particles: " + aqi_num_10 );
   
   /* Initialize particles for PM10 and PM2.5 */  
-  int num_25 = int(map(aqi_num_25, 0, AQI_MAX, 0, MAX_PM_25));
-  int num_10 = int(map(aqi_num_10, 0, AQI_MAX, 0, MAX_PM_10));
+  // Min no. of particles = skeleton points: 20 to show the skeleton too.
+  int num_25 = int(map(aqi_num_25, 0, AQI_MAX, 20, MAX_PM_25));
+  int num_10 = int(map(aqi_num_10, 0, AQI_MAX, 20, MAX_PM_10));
   
   int num_gases = MAX_MOVERS - (num_25 + num_10);
   float num_aqi_gases = aqivals.get(2) + aqivals.get(3);
@@ -241,13 +242,12 @@ void moveEvent(SkeletonData _b, SkeletonData _a)
 
 void updatePositionKinect(SkeletonData body){
      PVector body_pos = new PVector(body.position.x*width, body.position.y*height);
-     //PVector[] body_part_pos = body.skeletonPositions;
      if(body_pos.mag() > 10){ // not at the edge of the screen/partially out
          //PM2.5 stick to human
          for(int i = 0; i < pm25_particles.size(); i++){
-           //PVector pos = new PVector(body_part_pos[i%movers.length].x*width, body_part_pos[i%movers.length].x*height);
            PVector pos = new PVector(body.skeletonPositions[i%body.skeletonPositions.length].x*width, body.skeletonPositions[i%body.skeletonPositions.length].y*height);
-           fill(0,0,127);
+           colorMode(RGB, 255);
+           fill(0,0,127); //blue ellipse for skeleton body
            ellipse(pos.x, pos.y, 16, 20);
            pm25_particles.get(i).update(pos);
         }
