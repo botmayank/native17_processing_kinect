@@ -33,15 +33,15 @@ int headline_index = 0;
 //AQI globals
 String AQI_TOKEN = "ENTER-TOKEN-HERE"; // Token generated from waqi.info
 
-int POLLING_INTERVAL = 2; // Seconds
-
-//@2556 : R.K Puram, Delhi, India
-//@1929 : Aichi, Japan
-//@5724 : London, UK
-//@10707: Sri Aurobindo Marg, New Delhi, India
-//@11278: Knowledge Park - III, Greater Noida, India
-//@10113: ITI Jahangirpuri, Delhi, Delhi, India
-//@10119: National Institute of Malaria Research, Dwarka, Delhi, India
+/*
+@2556 : R.K Puram, Delhi, India
+@1929 : Aichi, Japan
+@5724 : London, UK
+@10707: Sri Aurobindo Marg, New Delhi, India
+@11278: Knowledge Park - III, Greater Noida, India
+@10113: ITI Jahangirpuri, Delhi, Delhi, India
+@10119: National Institute of Malaria Research, Dwarka, Delhi, India
+*/
 
 StringDict city_list;
 
@@ -58,7 +58,13 @@ int MAX_PM_25 = 100;
 int MAX_PM_10 = 100;
 int AQI_MAX = 600;
 
+// common speeds and inertias for particles based on AQI
+float[] aqi_speeds = {5.0, 8.0, 10.0, 12.0, 15.0, 20.0};
+float[] aqi_inertias = {2.0, 5.0, 10.0, 15.0, 20.0, 25.0};
+
 void setup(){
+  println("AQI and pollutant data sequence by Mayank Joneja, Ameet Singh");
+  
   fullScreen();
   background(0);
   smooth();
@@ -104,44 +110,70 @@ void setup(){
   pm25_particles = new ArrayList<Mover>();
   pm10_particles = new ArrayList<Mover>();
   
+  // Initialize particles based on AQI
+  init_gases(num_gases);
+  init_pm10(num_10, int(aqi_num_10));
+  init_pm25(num_25, int(aqi_num_25));
+  
+  // Kinect init
+  kinect = new Kinect(this);
+  bodies = new ArrayList<SkeletonData> ();
+  
+  // Ticker text init
+  text_f = createFont("Subway Ticker",30,true);
+  // Initialize headline offscreen to the right 
+  text_x = width;
+}
+
+void init_pm25 (int num_25, int aqi) {
+    int aqi_cat = getAqiCategory(aqi); //0-5
+    //PM2.5
+    float[] pm25_radii = {15.0, 20.0, 25.0, 30.0, 40.0, 60.0, 80.0};
+    
+    //colorMode(HSB, 100);
+    //aqi_hue = getAqiCategoryHue(int(aqi_num_25));
+    //color col = color(aqi_hue, 80, 80);
+    colorMode(RGB);
+    color col = color(255, 255, 255);
+    
+    float r = pm25_radii[aqi_cat];    
+    float speed = aqi_speeds[aqi_cat];
+    float inertia = aqi_inertias[aqi_cat];    
+  
+  for(int i = 0; i < num_25; i++){
+    pm25_particles.add(new Mover(col, r, speed, inertia));
+  } 
+}
+
+void init_pm10 (int num_10, int aqi) {
+    int aqi_cat = getAqiCategory(aqi); //0-5
+    //PM10
+    float[] pm10_radii = {30.0, 40.0, 50.0, 60.0, 80.0, 120.0, 160.0};
+    
+    //colorMode(HSB, 100);
+    //aqi_hue = getAqiCategoryHue(int(aqi_num_25));
+    //color col = color(aqi_hue, 80, 80);
+    colorMode(RGB);
+    color col = color(0, 255, 0);
+    
+    float r = pm10_radii[aqi_cat];    
+    float speed = aqi_speeds[aqi_cat];
+    float inertia = aqi_inertias[aqi_cat];    
+  
+  for(int i = 0; i < num_10; i++){
+    pm10_particles.add(new Mover(col, r, speed, inertia));
+  } 
+}
+
+void init_gases(int num_gases) {  
   float inertia, speed;
   for(int i = 0; i < num_gases; i++){
     color col = color(random(50,255), random(10,90), 0);
-    float r = random(5.0, 10.0);
+    float r = random(2.0, 4.0);
     inertia = 15.0;
     speed = 20.0;
     movers.add(new Mover(col, r, speed, inertia));
   }
-  
-  //PM10
-  for(int i = 0; i < num_10; i++){
-    //color col = color(#B9AE6F);
-    colorMode(HSB, 100);
-    color col = color(aqi_hue, 50, 50);
-    float r = 50.0;
-    inertia = 40.0;
-    speed = 10.0;
-    pm10_particles.add(new Mover(col, r, speed, inertia));
-  }
-  
-  //PM2.5
-  for(int i = 0; i < num_25; i++){
-    //color col = color(#B9A113);
-    colorMode(HSB, 100);
-    color col = color(aqi_hue, 80, 80);
-    float r = 20.0;
-    inertia = 25.0;
-    speed = 15.0;
-    pm25_particles.add(new Mover(col, r, speed, inertia));
-  }
-  
-  kinect = new Kinect(this);
-  bodies = new ArrayList<SkeletonData> ();
-    
-  println("AQI and pollutant data sequence by Mayank Joneja, Ameet Singh");
-  text_f = createFont("Subway Ticker",30,true);  
-  // Initialize headline offscreen to the right 
-  text_x = width;
 }
 
 void draw(){
@@ -420,9 +452,14 @@ void printParticleVals(String city) {
 }
 
 int getAqiCategoryHue(int aqi_num) {
+  int[] aqi_colors = {119, 60, 33, 0, 283, 336 }; // HSV Hue values
+  int aqi_cat = getAqiCategory(aqi_num);
+  return aqi_colors[aqi_cat];
+}
+
+int getAqiCategory(int aqi_num) {
   int aqi_cat = 0;
   int[] aqi_level =  {0, 51, 101, 151, 201, 301};
-  int[] aqi_colors = {119, 60, 33, 0, 283, 336 }; // HSV Hue values
   
   if(aqi_num > aqi_level[0] && aqi_num < aqi_level[1]) {
     aqi_cat = 0; // Good - Green
@@ -440,6 +477,5 @@ int getAqiCategoryHue(int aqi_num) {
     println("Unexpected aqi_num: " + aqi_num);
     aqi_cat = 5;
   }
-  
-  return aqi_colors[aqi_cat];
+  return aqi_cat;
 }
