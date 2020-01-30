@@ -33,6 +33,7 @@ int headline_index = 0;
 //AQI globals
 String AQI_TOKEN = "ENTER-TOKEN-HERE"; // Token generated from waqi.info
 
+
 /*
 @2556 : R.K Puram, Delhi, India
 @1929 : Aichi, Japan
@@ -328,19 +329,21 @@ void updatePositionKinect(SkeletonData body){
 }
 
 void randomizeMovers(){
-  PVector pos = new PVector(random(width), random(height));
   for(int i = 0; i< movers.size(); i++){
+    PVector pos = new PVector(random(width), random(height));
     movers.get(i).update(pos);
   }
   
   //PM2.5
   for(int i = 0; i < pm25_particles.size(); i++){
-      pm25_particles.get(i).update(pos);
+    PVector pos = new PVector(random(width), random(height));
+    pm25_particles.get(i).update(pos);
   }
   
   //PM10
   for(int i = 0; i < pm10_particles.size(); i++){
-      pm10_particles.get(i).update(pos);
+    PVector pos = new PVector(random(width), random(height));
+    pm10_particles.get(i).update(pos);
   }
 }
 
