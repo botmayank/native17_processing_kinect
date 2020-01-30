@@ -82,9 +82,7 @@ void setup(){
   /* Find out AQI for PM2.5 and PM10 */
   println("Getting AQI Data for station-id: " + city);
   int aqi_num = getAqiVal(city);  
-  int aqi_hue = getAqiCategoryHue(aqi_num); // hue in 360 deg
-  aqi_hue = int(map(aqi_hue, 0, 360, 0, 100));
-  println("AQI single value: " + aqi_num + " AQI Hue (0-100): " + aqi_hue); 
+  println("AQI single value: " + aqi_num); 
   
   printParticleVals(city);
   FloatList aqivals = getParticleVals(city);
@@ -129,13 +127,8 @@ void init_pm25 (int num_25, int aqi) {
     int aqi_cat = getAqiCategory(aqi); //0-5
     //PM2.5
     float[] pm25_radii = {15.0, 20.0, 25.0, 30.0, 40.0, 60.0, 80.0};
-    
-    //colorMode(HSB, 100);
-    //aqi_hue = getAqiCategoryHue(int(aqi_num_25));
-    //color col = color(aqi_hue, 80, 80);
-    colorMode(RGB);
-    color col = color(255, 255, 255);
-    
+
+    color col = getAqiCategoryColor(aqi);
     float r = pm25_radii[aqi_cat];    
     float speed = aqi_speeds[aqi_cat];
     float inertia = aqi_inertias[aqi_cat];    
@@ -150,12 +143,7 @@ void init_pm10 (int num_10, int aqi) {
     //PM10
     float[] pm10_radii = {30.0, 40.0, 50.0, 60.0, 80.0, 120.0, 160.0};
     
-    //colorMode(HSB, 100);
-    //aqi_hue = getAqiCategoryHue(int(aqi_num_25));
-    //color col = color(aqi_hue, 80, 80);
-    colorMode(RGB);
-    color col = color(0, 255, 0);
-    
+    color col = getAqiCategoryColorDark(aqi);
     float r = pm10_radii[aqi_cat];    
     float speed = aqi_speeds[aqi_cat];
     float inertia = aqi_inertias[aqi_cat];    
@@ -451,10 +439,32 @@ void printParticleVals(String city) {
   }
 }
 
-int getAqiCategoryHue(int aqi_num) {
-  int[] aqi_colors = {119, 60, 33, 0, 283, 336 }; // HSV Hue values
+color getAqiCategoryColor(int aqi_num) {
   int aqi_cat = getAqiCategory(aqi_num);
-  return aqi_colors[aqi_cat];
+  
+  int[] aqi_hues = {121, 59, 24, 357, 333, 331, 0}; // HSV Hue values in 360 deg
+  int[] aqi_saturations = {77, 71, 83, 92, 90, 95, 0}; // HSV Sat values in 0-100
+  int[] aqi_brightnesses = {88, 100, 99, 99, 59, 29, 50}; // HSV Brightnes values in 0-100
+  
+  int aqi_hue = int(map(aqi_hues[aqi_cat], 0, 360, 0, 100));
+  colorMode(HSB, 100);
+  color aqi_color = color(aqi_hue, aqi_saturations[aqi_cat], aqi_brightnesses[aqi_cat]);
+  
+  return aqi_color;
+}
+
+color getAqiCategoryColorDark(int aqi_num) {
+  int aqi_cat = getAqiCategory(aqi_num);
+  
+  int[] aqi_hues = {121, 59, 24, 357, 333, 331, 0}; // HSV Hue values in 360 deg
+  int[] aqi_saturations = {77, 71, 83, 92, 90, 95, 0}; // HSV Sat values in 0-100
+  int[] aqi_brightnesses = {88, 100, 99, 99, 59, 29, 50}; // HSV Brightnes values in 0-100
+  
+  int aqi_hue = int(map(aqi_hues[aqi_cat], 0, 360, 0, 100));
+  colorMode(HSB, 100);
+  color aqi_color = color(aqi_hue, aqi_saturations[aqi_cat], aqi_brightnesses[aqi_cat] - 25);
+  
+  return aqi_color;
 }
 
 int getAqiCategory(int aqi_num) {
