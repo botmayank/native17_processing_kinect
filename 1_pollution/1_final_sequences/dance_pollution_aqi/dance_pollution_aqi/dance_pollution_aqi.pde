@@ -34,8 +34,19 @@ int headline_index = 0;
 String AQI_TOKEN = "ENTER-TOKEN-HERE"; // Token generated from waqi.info
 
 int POLLING_INTERVAL = 2; // Seconds
+
+//@2556 : R.K Puram, Delhi, India
+//@1929 : Aichi, Japan
+//@5724 : London, UK
+//@10707: Sri Aurobindo Marg, New Delhi, India
+//@11278: Knowledge Park - III, Greater Noida, India
+//@10113: ITI Jahangirpuri, Delhi, Delhi, India
+//@10119: National Institute of Malaria Research, Dwarka, Delhi, India
+
+StringDict city_list;
+
 String city = "@2556"; //R.K. Puram
-//String city = "@1929"; //Aichi, Japan
+//String city = "@11278"; //Greater Noida
 
 //Particle globals
 ArrayList<Mover> movers, pm25_particles, pm10_particles; //movers are all other gases
@@ -48,6 +59,16 @@ void setup(){
   fullScreen();
   background(0);
   smooth();
+  
+  /* City list for text */
+  city_list = new StringDict();
+  city_list.set("@2556", "R.K Puram, Delhi, India");
+  city_list.set("@1929", "Aichi, Japan");
+  city_list.set("@5724", "London, UK");
+  city_list.set("@10707", "Sri Aurobindo Marg, New Delhi, India");
+  city_list.set("@11278", "Knowledge Park - III, Greater Noida, India");
+  city_list.set("@10113", "ITI Jahangirpuri, Delhi, Delhi, India");
+  city_list.set("@10119", "National Institute of Malaria Research, Dwarka, Delhi, India");
   
   /* Find out AQI for PM2.5 and PM10 */
   println("Getting AQI Data for station-id: " + city);
