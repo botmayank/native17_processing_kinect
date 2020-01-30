@@ -51,6 +51,8 @@ String city = "@1929";
 
 //Particle globals
 ArrayList<Mover> movers, pm25_particles, pm10_particles; //movers are all other gases
+int MIN_PARTICLES_25 = 3;
+int MIN_PARTICLES_10 = 3;
 int MAX_MOVERS = 150;
 int MAX_PM_25 = 100;
 int MAX_PM_10 = 100;
@@ -84,10 +86,9 @@ void setup(){
   float aqi_num_10 = aqivals.get(1); // pm 10
   println("No. of PM2.5 particles: " + aqi_num_25 + " pm10 particles: " + aqi_num_10 );
   
-  /* Initialize particles for PM10 and PM2.5 */  
-  // Min no. of particles = skeleton points: 20 to show the skeleton too.
-  int num_25 = int(map(aqi_num_25, 0, AQI_MAX, 20, MAX_PM_25));
-  int num_10 = int(map(aqi_num_10, 0, AQI_MAX, 20, MAX_PM_10));
+  /* Initialize particles for PM10 and PM2.5 */
+  int num_25 = int(map(aqi_num_25, 0, AQI_MAX, MIN_PARTICLES_25, MAX_PM_25));
+  int num_10 = int(map(aqi_num_10, 0, AQI_MAX, MIN_PARTICLES_10, MAX_PM_10));
   
   int num_gases = MAX_MOVERS - (num_25 + num_10);
   float num_aqi_gases = aqivals.get(2) + aqivals.get(3);
@@ -265,24 +266,42 @@ void moveEvent(SkeletonData _b, SkeletonData _a)
 
 void updatePositionKinect(SkeletonData body){
      PVector body_pos = new PVector(body.position.x*width, body.position.y*height);
+     int target_x = 0, target_y = 0;
+     float body_x = 0, body_y = 0;
      if(body_pos.mag() > 10){ // not at the edge of the screen/partially out
-         //PM2.5 stick to human
-         for(int i = 0; i < pm25_particles.size(); i++){
-           PVector pos = new PVector(body.skeletonPositions[i%body.skeletonPositions.length].x*width, body.skeletonPositions[i%body.skeletonPositions.length].y*height);
+         // Draw body ellipses
+         for (int i = 0; i < body.skeletonPositions.length; i++) {           
+           // update body ellipse
            colorMode(RGB, 255);
+           body_x = body.skeletonPositions[i].x*width;
+           body_y = body.skeletonPositions[i].y*height;
+           
+           PVector body_part_pos = new PVector(body_x, body_y);
            fill(0,0,127); //blue ellipse for skeleton body
-           ellipse(pos.x, pos.y, 16, 20);
+           ellipse(body_part_pos.x, body_part_pos.y, 16, 20);
+         }         
+         //PM2.5 stick to human + small amount of randomness
+         for(int i = 0; i < pm25_particles.size(); i++){
+           body_x = body.skeletonPositions[i%body.skeletonPositions.length].x*width;
+           body_y = body.skeletonPositions[i%body.skeletonPositions.length].y*height;
+           target_x = int(body_x + random(-width/10, width/10));
+           target_y = int(body_y + random(-height/10, height/10));
+           PVector pos = new PVector(target_x, target_y);
            pm25_particles.get(i).update(pos);
         }
-        //PM 10 and movers random
-        PVector pos = new PVector(random(width), random(height));
+        //PM 10 stick to human + some more randomness     
         for(int i = 0; i < pm10_particles.size(); i++){
+          target_x = int(body.skeletonPositions[i%body.skeletonPositions.length].x*width + random(-width/4, width/4));
+          target_y = int(body.skeletonPositions[i%body.skeletonPositions.length].y*height + random(-height/4, height/4));
+          PVector pos = new PVector(target_x, target_y);
           pm10_particles.get(i).update(pos);
         }
+        // Gases random
         for(int i = 0; i < movers.size(); i++){
+          PVector pos = new PVector(random(width), random(height));
           movers.get(i).update(pos);
         }        
-     }
+     } //if
      else{
        randomizeMovers();
      }
