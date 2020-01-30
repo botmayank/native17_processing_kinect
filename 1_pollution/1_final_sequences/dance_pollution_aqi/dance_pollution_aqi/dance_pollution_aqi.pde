@@ -45,8 +45,9 @@ int POLLING_INTERVAL = 2; // Seconds
 
 StringDict city_list;
 
-String city = "@2556"; //R.K. Puram
+//String city = "@2556"; //R.K. Puram
 //String city = "@11278"; //Greater Noida
+String city = "@1929";
 
 //Particle globals
 ArrayList<Mover> movers, pm25_particles, pm10_particles; //movers are all other gases
@@ -153,6 +154,7 @@ void draw(){
   } else { //mouse mode
     followMouse(1); 
   }
+  displayCity();
 }
 
 //Mouse mode
@@ -323,6 +325,13 @@ void displayHeader(){
       text_x = width; 
       headline_index = (headline_index + 1) % headlines.length;
     }
+}
+
+void displayCity() {
+    int padding = 20;
+    textFont(text_f, 48);
+    textAlign(RIGHT);
+    text(city_list.get(city), width - padding, height - padding); // bottom right corner
 }
 
 /************************AQI Methods*************************/
